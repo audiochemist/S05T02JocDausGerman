@@ -44,7 +44,7 @@ public class AuthService implements AuthServiceInterface {
                         request.getPassword()
                 )
         );
-        var user = userRepository.findUserByUserName(request.getEmail()).orElseThrow();
+        var user = userRepository.findUserByEmail(request.getEmail()).orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         return AuthResponse.builder().token(jwtToken).build();
     }
