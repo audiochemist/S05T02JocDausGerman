@@ -16,12 +16,12 @@ public class PlayerController {
     @Autowired
     PlayerEntityServiceInterface playerService;
 
-    @PostMapping("/players")
+    @PostMapping("/addPlayers")
     public ResponseEntity<PlayerEntityDTO> addPlayer(@RequestBody PlayerEntityDTO playerDTO){
         return new ResponseEntity<>(playerService.save(playerDTO), HttpStatus.CREATED);
     }
 
-    @PutMapping("/players/{id}")
+    @PutMapping("/players/update/{id}")
     public ResponseEntity<PlayerEntityDTO> updatePlayer(@PathVariable long id, @RequestBody PlayerEntityDTO playerDTO) {
         PlayerEntityDTO playerToUpdate = playerService.update(id,playerDTO);
         return new ResponseEntity<>(playerToUpdate,HttpStatus.CREATED);
@@ -33,7 +33,7 @@ public class PlayerController {
         return new ResponseEntity<>(players,HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("players/delete/{id}")
     public ResponseEntity<?> deletePlayer (@PathVariable long id){
         playerService.deleteById(id);
         return new ResponseEntity<>("Player deleted.",HttpStatus.OK);

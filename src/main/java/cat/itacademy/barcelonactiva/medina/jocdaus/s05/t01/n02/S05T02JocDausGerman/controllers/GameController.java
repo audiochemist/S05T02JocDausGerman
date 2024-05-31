@@ -19,22 +19,22 @@ public class GameController {
 
     @Autowired
     private GameEntityService gameService;
-    @Autowired
-    private PlayerEntityService playerService;
 
-    @PostMapping("/{id}/games")
-    public ResponseEntity<?> playGame (@PathVariable long playerID){
-        GameEntityDTO gameDTO = gameService.playGame(playerID);
+    @PostMapping("/{playerId}/games")
+    public ResponseEntity<?> playGame(@PathVariable("playerId") long playerId){
+        GameEntityDTO gameDTO = gameService.playGame(playerId);
         return new ResponseEntity<>(gameDTO, HttpStatus.CREATED);
     }
-    @GetMapping("/{id}/games")
-    public ResponseEntity<?> getAllGames (@PathVariable long id){
-        List<GameEntityDTO> gameDTOList = gameService.getByPlayerId(id);
+
+    @GetMapping("/{playerId}/games")
+    public ResponseEntity<?> getAllGames(@PathVariable("playerId") long playerId){
+        List<GameEntityDTO> gameDTOList = gameService.getByPlayerId(playerId);
         return new ResponseEntity<>(gameDTOList, HttpStatus.OK);
     }
-    @DeleteMapping("/{id}/games")
-    public ResponseEntity<?> deleteAllGames (@PathVariable long id){
-        gameService.deleteByPlayer(id);
+
+    @DeleteMapping("/{playerId}/games")
+    public ResponseEntity<?> deleteAllGames(@PathVariable("playerId") long playerId){
+        gameService.deleteByPlayer(playerId);
         return new ResponseEntity<>("Games have been deleted.", HttpStatus.OK);
     }
 

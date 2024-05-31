@@ -41,6 +41,10 @@ public class GameEntityService implements GameEntityServiceInterface {
                 .orElseThrow(() -> new EntityNotFoundException("The player was not found"));
         GameEntity newGame = new GameEntity();
         newGame.play();
+
+        playerSelected.setWinRate(playerSelected.calculateSuccessRate());
+        playerRepository.save(playerSelected);
+
         newGame.setPlayer(playerSelected);
         playerSelected.addingGame(newGame);
         gameRepository.save(newGame);

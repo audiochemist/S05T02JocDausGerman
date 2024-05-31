@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.sql.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,8 +27,12 @@ public class PlayerEntity {
     @Column(name="Player_Name")
     private String playerName;
 
-    @Column(name="Register_Date")
-    private LocalDateTime registerDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false)
+    private final Date registerDate = new Date();
+
+    @Column(name="Win_rate")
+    private double winRate;
 
     @OneToMany(mappedBy = "player")
     private List<GameEntity> gamesList;
@@ -45,12 +49,12 @@ public class PlayerEntity {
         gamesList.add(game);
     }
 
-    public float calculateSuccessRate() {
+    public double calculateSuccessRate() {
         if (gamesList != null && !gamesList.isEmpty()) {
             long totalGames = gamesList.size();
             long wonGames = gamesList.stream().filter(GameEntity::hasWon).count();
-            return (float) wonGames / totalGames * 100;
+            return winRate = wonGames / totalGames * 100;
         }
-        return 0.0f;
+        return winRate = 0;
     }
 }

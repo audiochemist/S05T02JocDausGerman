@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GameEntityDTO {
     private long gameID;
-    private int diceOne;
-    private int diceTwo;
+    private int die1;
+    private int die2;
     private boolean won;
 
 }
