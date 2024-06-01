@@ -2,5 +2,6 @@ package cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGer
 
 public enum Role {
     USER,
-    ADMIN
+    ADMIN,
+    ANONYMOUS
 }

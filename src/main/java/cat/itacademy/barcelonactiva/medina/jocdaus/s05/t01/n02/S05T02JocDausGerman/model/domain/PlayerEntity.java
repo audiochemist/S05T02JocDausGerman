@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,8 +55,11 @@ public class PlayerEntity {
         if (gamesList != null && !gamesList.isEmpty()) {
             long totalGames = gamesList.size();
             long wonGames = gamesList.stream().filter(GameEntity::hasWon).count();
-            return winRate = wonGames / totalGames * 100;
+            winRate =  wonGames / totalGames * 100;
+            BigDecimal bd = new BigDecimal(winRate).setScale(2, RoundingMode.HALF_UP);
+            return bd.doubleValue();
+        }else{
+            return 0;
         }
-        return winRate = 0;
     }
 }

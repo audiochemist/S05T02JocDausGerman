@@ -1,6 +1,8 @@
 package cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.services.impl;
 
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.domain.PlayerEntity;
+import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.domain.Role;
+import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.domain.UserEntity;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.dto.PlayerEntityDTO;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions.PlayerNameAlreadyExists;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions.PlayerNotFound;
@@ -26,16 +28,21 @@ public class PlayerEntityService implements PlayerEntityServiceInterface {
     ModelMapper playerModelMapper;
     @Override
     public PlayerEntityDTO save(PlayerEntityDTO player) {
-        String playerName = player.getPlayerName();
-        if (playerName == null) {
+
+        PlayerEntity newPlayer = getPlayerEntityFrom(player);
+        UserEntity user = newPlayer.getUser();
+        if (user != null && user.getRole() == Role.ANONYMOUS) {
             player.setPlayerName("Anonymous");
+        } else {
+
+            String playerName = player.getPlayerName();
+            if (playerName.isBlank()) {
+                player.setPlayerName("Anonymous");
+            } else if (playerRepository.findByPlayerName(playerName).isPresent()) {
+                throw new PlayerNameAlreadyExists("Player name already in use");
+            }
         }
-        else if (playerRepository.findByPlayerName(playerName).isPresent()) {
-            throw new PlayerNameAlreadyExists("Player name already in use");
-        }
-        return getPlayerDTOFrom(
-                playerRepository.save(
-                        getPlayerEntityFrom(player)));
+        return getPlayerDTOFrom(playerRepository.save(getPlayerEntityFrom(player)));
     }
 
     @Override

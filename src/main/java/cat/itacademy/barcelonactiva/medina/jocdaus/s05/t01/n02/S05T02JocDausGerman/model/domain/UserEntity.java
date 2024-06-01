@@ -32,8 +32,10 @@ public class UserEntity implements UserDetails {
     private String email;
     @Column
     private String password;
+
     @Enumerated(EnumType.ORDINAL)
     private Role role;
+
     @OneToMany(mappedBy = "user")
     private List<PlayerEntity> players;
 
