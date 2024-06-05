@@ -19,28 +19,30 @@ import java.util.List;
 @Builder
 @Data
 @Entity
-@Table (name="Player")
+@Table(name = "Player")
 public class PlayerEntity {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long playerID;
 
-    @Column(name="Player_Name")
+    @Column(name = "Player_Name")
     private String playerName;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false, updatable = false)
     private final Date registerDate = new Date();
 
-    @Column(name="Win_rate")
+    @Column(name = "Win_rate")
     private double winRate;
 
     @OneToMany(mappedBy = "player")
     private List<GameEntity> gamesList;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @Column(name = "user_id")
+    private String userId;
+
+    @Transient
     private UserEntity user;
 
 
@@ -52,14 +54,16 @@ public class PlayerEntity {
     }
 
     public double calculateSuccessRate() {
-        if (gamesList != null && !gamesList.isEmpty()) {
-            long totalGames = gamesList.size();
-            long wonGames = gamesList.stream().filter(GameEntity::hasWon).count();
-            winRate =  wonGames / totalGames * 100;
-            BigDecimal bd = new BigDecimal(winRate).setScale(2, RoundingMode.HALF_UP);
-            return bd.doubleValue();
-        }else{
+
+        if (gamesList.isEmpty()) {
             return 0;
         }
+
+        long totalGames = gamesList.size();
+        long wonGames = gamesList.stream().filter(GameEntity::hasWon).count();
+        winRate = ((double) wonGames / totalGames) * 100;
+
+        return winRate;
+
     }
 }

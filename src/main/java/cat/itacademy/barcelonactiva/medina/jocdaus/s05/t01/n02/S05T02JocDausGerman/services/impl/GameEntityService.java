@@ -4,6 +4,8 @@ package cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGer
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.domain.GameEntity;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.domain.PlayerEntity;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.dto.GameEntityDTO;
+import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions.GameNotFound;
+import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions.PlayerNotFound;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.repositories.GameRepository;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.repositories.PlayerRepository;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.services.GameEntityServiceInterface;
@@ -14,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,24 +31,22 @@ public class GameEntityService implements GameEntityServiceInterface {
     @Autowired
     ModelMapper gameModelMapper;
 
-
-    //TODO refactorizar linea para buscar juagdor en un metodo - lo utilizan todos los metodos igual
-
     @Transactional
     @Override
     public GameEntityDTO playGame(long playerID) {
 
         PlayerEntity playerSelected = playerRepository.findById(playerID)
                 .orElseThrow(() -> new EntityNotFoundException("The player was not found"));
+
         GameEntity newGame = new GameEntity();
         newGame.play();
 
+        playerSelected.addingGame(newGame);
         playerSelected.setWinRate(playerSelected.calculateSuccessRate());
-        playerRepository.save(playerSelected);
+        playerRepository.save(playerSelected); // Guardar primero el jugador para actualizar winRate
 
         newGame.setPlayer(playerSelected);
-        playerSelected.addingGame(newGame);
-        gameRepository.save(newGame);
+        gameRepository.save(newGame); // Luego guardar el nuevo juego
 
         return getGameDTOFrom(newGame);
     }
@@ -56,7 +55,11 @@ public class GameEntityService implements GameEntityServiceInterface {
     @Override
     public List<GameEntityDTO> getByPlayerId(long playerID) {
         playerRepository.findById(playerID).
-                orElseThrow(() -> new EntityNotFoundException("Id not found"));
+                orElseThrow(() -> new PlayerNotFound("Player not found."));
+        List<GameEntity> games = gameRepository.findByPlayer_PlayerID(playerID);
+        if (games.isEmpty()) {
+            throw new GameNotFound("Empty Game History.");
+        }
         return gameRepository.findByPlayer_PlayerID(playerID).stream().
                 map(this::getGameDTOFrom).collect(Collectors.toList());
 
@@ -64,10 +67,25 @@ public class GameEntityService implements GameEntityServiceInterface {
     @Transactional
     @Override
     public void deleteByPlayer(long playerID) {
-        playerRepository.findById(playerID).orElseThrow(() -> new EntityNotFoundException("Id not found."));
-        gameRepository.deleteByPlayer_PlayerID(playerID);
+        PlayerEntity player = playerRepository.findById(playerID).orElseThrow(() -> new PlayerNotFound("Player not found."));
+
+        List<GameEntity> games = gameRepository.findByPlayer_PlayerID(playerID);
+        if (games.isEmpty()) {
+            throw new GameNotFound("Empty Game History.");
+        }
+
+        gameRepository.deleteAllByPlayer(player);
     }
-//TODO Hacer una clase convertidora de modelos para ambos players y games
+
+    @Override
+    public List<GameEntityDTO> findAll() {
+        List<GameEntity> games = gameRepository.findAll();
+        if (games.isEmpty()){
+            throw new GameNotFound("No games found in the system");
+        }
+        return games.stream().map(this::getGameDTOFrom).collect(Collectors.toList());
+    }
+
     private GameEntityDTO getGameDTOFrom(GameEntity gameEntity) {
         return gameModelMapper.map(gameEntity, GameEntityDTO.class);
     }

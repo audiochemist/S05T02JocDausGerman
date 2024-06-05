@@ -22,13 +22,13 @@ import java.util.Optional;
 public class GameEntity {
 
         @Id
-        @GeneratedValue(strategy=GenerationType.AUTO)
+        @GeneratedValue(strategy=GenerationType.IDENTITY)
         private long gameID;
 
-        @Column(name="Dice_One")
+        @Column(name="Die_One")
         private int die1;
 
-        @Column(name="Dice_Two")
+        @Column(name="Die_Two")
         private int die2;
 
         @Column(name="Result")

@@ -18,4 +18,5 @@ public class PlayerEntityDTO {
     private String playerName;
     private Date registerDate;
     private double winRate;
+    private String userID;
 }

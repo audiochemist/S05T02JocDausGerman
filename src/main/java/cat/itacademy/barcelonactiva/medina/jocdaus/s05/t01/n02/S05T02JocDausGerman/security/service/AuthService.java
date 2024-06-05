@@ -2,6 +2,8 @@ package cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGer
 
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.domain.Role;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.domain.UserEntity;
+import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions.BadCredentials;
+import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions.PlayerNotFound;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.security.auth.*;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.repositories.UserRepository;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.security.service.AuthServiceInterface;
@@ -10,6 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,36 +34,19 @@ public class AuthService implements AuthServiceInterface {
         if (userRepository.findUserByUserName(request.getUserName()).isPresent()) {
             throw new RuntimeException("User name already exists");
         }
+        String userId = UUID.randomUUID().toString();
 
-        UserEntity user = new UserEntity();
-        user.setUserName(request.getUserName());
-        user.setEmail(request.getEmail());
-
-        String encodedPassword = passwordEncoder.encode(request.getPassword());
-        user.setPassword(encodedPassword);
-
-        user.setUserName(request.getUserName().isBlank() ? "ANONYMOUS" : request.getUserName());
-        user.setRole(
-                request.getUserName().isBlank() ? Role.ANONYMOUS :
-                        (request.getUserName().startsWith("admin") ? Role.ADMIN : Role.USER)
-        );
+        UserEntity user = UserEntity.builder()
+                .userId(userId)
+                .userName(request.getUserName().isBlank() ? "ANONYMOUS" : request.getUserName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(request.getUserName().isBlank() ? Role.ANONYMOUS :
+                        (request.getUserName().startsWith("admin") ? Role.ADMIN : Role.USER))
+                .build();
 
         return userRepository.save(user);
 
-        /*
-        var user = UserEntity.builder()
-                .userName(request.getUserName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .build();
-        userRepository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        return AuthResponse.builder()
-                .token(jwtToken).build();
-
-
-         */
     }
 
     @Override
@@ -70,7 +57,7 @@ public class AuthService implements AuthServiceInterface {
                         request.getPassword()
                 )
         );
-        var user = userRepository.findUserByEmail(request.getEmail()).orElseThrow();
+        var user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() -> new BadCredentials("Incorrect credentials"));
         var jwtToken = jwtService.generateToken(user);
         return AuthResponse.builder().token(jwtToken).build();
     }

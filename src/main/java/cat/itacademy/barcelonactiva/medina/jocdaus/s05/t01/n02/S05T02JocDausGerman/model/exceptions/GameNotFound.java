@@ -1,8 +1,8 @@
 package cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions;
 
-public class PlayerNameAlreadyExists extends RuntimeException{
+public class GameNotFound extends RuntimeException{
 
-    public PlayerNameAlreadyExists(String message) {
+    public GameNotFound(String message) {
         super(message);
     }
 }

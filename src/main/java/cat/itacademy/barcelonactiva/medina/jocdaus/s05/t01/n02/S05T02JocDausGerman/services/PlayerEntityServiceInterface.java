@@ -2,14 +2,18 @@ package cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGer
 
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.dto.PlayerEntityDTO;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions.PlayerNotFound;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
 public interface PlayerEntityServiceInterface {
 
-    PlayerEntityDTO save(PlayerEntityDTO playerEntityDTO);
+    List<PlayerEntityDTO> findAll();
+    PlayerEntityDTO save(PlayerEntityDTO playerEntityDTO, Authentication authentication);
     PlayerEntityDTO update (long id, PlayerEntityDTO playerEntityDTO) throws PlayerNotFound;
     void deleteById(long id) throws PlayerNotFound;
-    PlayerEntityDTO findById(long id) throws PlayerNotFound;
-    List<PlayerEntityDTO> findAll();
+    PlayerEntityDTO getBestWinRate();
+    PlayerEntityDTO getWorstWinRate();
+    List<PlayerEntityDTO> findAllByWinrate();
+
 }

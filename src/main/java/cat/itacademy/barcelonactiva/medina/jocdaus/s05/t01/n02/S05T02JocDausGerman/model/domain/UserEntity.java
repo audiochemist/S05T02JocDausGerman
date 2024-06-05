@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,31 +14,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
-@Table(name = "users")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@Document(collection = "users")
 public class UserEntity implements UserDetails {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
-    private long userId;
-    @Column
+    private String userId;
     private String userName;
-    @Column
     private String email;
-    @Column
     private String password;
-
-    @Enumerated(EnumType.ORDINAL)
     private Role role;
-
-    @OneToMany(mappedBy = "user")
-    private List<PlayerEntity> players;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
