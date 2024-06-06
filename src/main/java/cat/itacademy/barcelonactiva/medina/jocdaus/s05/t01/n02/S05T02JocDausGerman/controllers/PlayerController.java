@@ -3,6 +3,7 @@ package cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGer
 
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.domain.UserEntity;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.dto.PlayerEntityDTO;
+import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions.NoPermissions;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions.UserNotFound;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.services.PlayerEntityServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,7 @@ public class PlayerController {
     @GetMapping("/")
     public ResponseEntity<List<PlayerEntityDTO>> getAllPlayers(Authentication authentication) {
         if (!authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-            //TODO hacer excepcion personalizada
-            throw new InsufficientAuthenticationException("You dont have permissions");
+            throw new NoPermissions("You dont have permissions");
         }
         List<PlayerEntityDTO> players = playerService.findAll();
         return new ResponseEntity<>(players, HttpStatus.OK);
@@ -45,8 +45,7 @@ public class PlayerController {
     @DeleteMapping("players/delete/{id}")
     public ResponseEntity<?> deletePlayer(@PathVariable long id, Authentication authentication) {
         if (!authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-            //TODO hacer excepcion personalizada
-            throw new InsufficientAuthenticationException("You dont have permissions");
+            throw new NoPermissions("You dont have permissions");
         }
         playerService.deleteById(id);
         return new ResponseEntity<>("Player deleted.", HttpStatus.OK);

@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface UserEntityServiceInterface {
 
-    UserEntityDTO update(String id, UserEntityDTO user) throws UserNotFound;
-    void deleteById(String id) throws UserNotFound;
     UserEntityDTO findById(String id) throws UserNotFound;
     List<UserEntityDTO> findAll();
 }

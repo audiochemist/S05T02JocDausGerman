@@ -43,10 +43,10 @@ public class GameEntityService implements GameEntityServiceInterface {
 
         playerSelected.addingGame(newGame);
         playerSelected.setWinRate(playerSelected.calculateSuccessRate());
-        playerRepository.save(playerSelected); // Guardar primero el jugador para actualizar winRate
+        playerRepository.save(playerSelected);
 
         newGame.setPlayer(playerSelected);
-        gameRepository.save(newGame); // Luego guardar el nuevo juego
+        gameRepository.save(newGame);
 
         return getGameDTOFrom(newGame);
     }
@@ -55,7 +55,7 @@ public class GameEntityService implements GameEntityServiceInterface {
     @Override
     public List<GameEntityDTO> getByPlayerId(long playerID) {
         playerRepository.findById(playerID).
-                orElseThrow(() -> new PlayerNotFound("Player not found."));
+                orElseThrow(() -> new PlayerNotFound("Player was not found."));
         List<GameEntity> games = gameRepository.findByPlayer_PlayerID(playerID);
         if (games.isEmpty()) {
             throw new GameNotFound("Empty Game History.");

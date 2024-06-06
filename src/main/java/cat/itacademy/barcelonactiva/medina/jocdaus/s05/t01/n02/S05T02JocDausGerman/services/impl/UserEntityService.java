@@ -22,22 +22,6 @@ public class UserEntityService implements UserEntityServiceInterface {
     private ModelMapper userModelMapper;
 
     @Override
-    public UserEntityDTO update(String id, UserEntityDTO userEntityDTO) throws UserNotFound {
-        UserEntityDTO existingUser = findById(id);
-        existingUser.setUserName(userEntityDTO.getUserName());
-        existingUser.setEmail(userEntityDTO.getEmail());
-        existingUser.setPassword(userEntityDTO.getPassword());
-        userRepository.save(getUserEntityFrom(existingUser));
-        return existingUser;
-    }
-
-    @Override
-    public void deleteById(String id) throws UserNotFound {
-        UserEntityDTO existingUser = findById(id);
-        userRepository.delete(getUserEntityFrom(existingUser));
-    }
-
-    @Override
     public UserEntityDTO findById(String id) throws UserNotFound {
         return userRepository.findById(id).map(this::getUserDTOFrom).orElseThrow(() -> new UserNotFound("The user was not found"));
     }

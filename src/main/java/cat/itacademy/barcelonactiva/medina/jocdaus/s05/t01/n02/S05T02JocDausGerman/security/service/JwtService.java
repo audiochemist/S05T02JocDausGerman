@@ -7,6 +7,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.hibernate.annotations.DialectOverride;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -19,20 +20,19 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY_PROPERTY = "your-256-bit-secret";
+    @Value("${security.jwt.secret-key}")
+    private String secretKeyProperty;
+
     private Key secretKey;
 
     @PostConstruct
-    public void init() {
-        if (SECRET_KEY_PROPERTY == null || SECRET_KEY_PROPERTY.isEmpty() || SECRET_KEY_PROPERTY.equals("your-256-bit-secret")) {
-            // Generate a new key if SECRET_KEY_PROPERTY is not provided or is the default placeholder
+    public void initialize() {
+        if (secretKeyProperty == null || secretKeyProperty.isEmpty()) {
             secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
             String base64Key = Base64.getEncoder().encodeToString(secretKey.getEncoded());
             System.out.println("Generated key: " + base64Key);
-            // Log the generated key for development purposes, but remember to securely store it in a real application
         } else {
-            // Use the provided secret key
-            byte[] keyBytes = Base64.getDecoder().decode(SECRET_KEY_PROPERTY);
+            byte[] keyBytes = Decoders.BASE64.decode(secretKeyProperty);
             secretKey = Keys.hmacShaKeyFor(keyBytes);
         }
     }

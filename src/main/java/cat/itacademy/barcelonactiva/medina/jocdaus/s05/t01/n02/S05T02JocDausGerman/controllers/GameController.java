@@ -2,6 +2,7 @@ package cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGer
 
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.domain.GameEntity;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.dto.GameEntityDTO;
+import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.model.exceptions.NoPermissions;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.services.impl.GameEntityService;
 import cat.itacademy.barcelonactiva.medina.jocdaus.s05.t01.n02.S05T02JocDausGerman.services.impl.PlayerEntityService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class GameController {
     @GetMapping(path = "/allExistingGames")
     public ResponseEntity<List<GameEntityDTO>> getAllGames(Authentication authentication) {
         if (!authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-            throw  new InsufficientAuthenticationException("You dont have permissions");
+            throw new NoPermissions("You dont have permissions");
         }
         List<GameEntityDTO> games = gameService.findAll();
         return ResponseEntity.ok().body(games);

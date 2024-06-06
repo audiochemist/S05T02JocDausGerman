@@ -18,7 +18,7 @@ import java.util.Optional;
 @Builder
 @Data
 @Entity
-@Table(name="Game") // Entidad por que quiero guardar el registro de jugadas.
+@Table(name="Game")
 public class GameEntity {
 
         @Id

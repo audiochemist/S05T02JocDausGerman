@@ -36,11 +36,10 @@ public class PlayerEntityService implements PlayerEntityServiceInterface {
         UserEntity user = userRepository.findUserByEmail(userEmail)
                 .orElseThrow(() -> new UserNotFound("User not found"));
 
-        // Asigna el userId del usuario autenticado al playerDTO
         PlayerEntity newPlayer = getPlayerEntityFrom(player);
         newPlayer.setUserId(user.getUserId());
         newPlayer.setUser(user);
-
+        user.getPlayerNames().add(newPlayer.getPlayerName());
 
         String playerName = player.getPlayerName();
         if (user.getRole() != Role.ANONYMOUS && !playerName.isBlank() && playerRepository.findByPlayerName(playerName).isPresent()) {
@@ -58,8 +57,11 @@ public class PlayerEntityService implements PlayerEntityServiceInterface {
     @Override
     public PlayerEntityDTO update(long id, PlayerEntityDTO playerEntityDTO) throws PlayerNotFound {
         PlayerEntity existingPlayer = playerRepository.findById(id).orElseThrow(() -> new PlayerNotFound("Player was not found"));
-        if (playerRepository.findByPlayerName(existingPlayer.getPlayerName()).isPresent()) {
-            throw new PlayerNameAlreadyExists("Player name already in use");
+
+        if (!existingPlayer.getPlayerName().equals(playerEntityDTO.getPlayerName())) {
+            if (playerRepository.findByPlayerName(playerEntityDTO.getPlayerName()).isPresent()) {
+                throw new PlayerNameAlreadyExists("Player name already in use");
+            }
         }
         existingPlayer.setPlayerName(playerEntityDTO.getPlayerName());
         playerRepository.save(existingPlayer);

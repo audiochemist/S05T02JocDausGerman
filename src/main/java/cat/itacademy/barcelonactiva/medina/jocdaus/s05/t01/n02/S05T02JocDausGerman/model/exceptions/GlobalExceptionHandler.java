@@ -16,6 +16,9 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+
+
     @ExceptionHandler(UserNotFound.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<?> handleUserNotFound (UserNotFound e){
@@ -35,7 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(PlayerNameAlreadyExists.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<?> handlePlayerAlredyExists (PlayerNameAlreadyExists e){
+    public ResponseEntity<?> handlePlayerNameAlreadyExists (PlayerNameAlreadyExists e){
         return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
     }
 
@@ -49,6 +52,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(NoPermissions.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<?> handleNoPermissions(NoPermissions e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
     }
 
 

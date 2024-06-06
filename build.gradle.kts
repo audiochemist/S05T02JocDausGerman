@@ -1,3 +1,4 @@
+
 plugins {
 	java
 	id("org.springframework.boot") version "3.2.5"
@@ -49,6 +50,7 @@ dependencies {
 	testImplementation ("au.com.dius.pact.consumer:junit5:4.3.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+
 	compileOnly("org.projectlombok:lombok")
 	implementation ("io.jsonwebtoken:jjwt-api:0.11.5")
 	runtimeOnly ("io.jsonwebtoken:jjwt-impl:0.11.5")
@@ -61,4 +63,6 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	jvmArgs("-XX:+EnableDynamicAgentLoading")
+
 }
